@@ -5,6 +5,9 @@ This is the Chinese translation of BWA's [Introduction](http://bio-bwa.sourcefor
 
 这是BWA[介绍页](http://bio-bwa.sourceforge.net/)和[使用手册](http://bio-bwa.sourceforge.net/bwa.shtml)的中文翻译。 BWA是常用的第二代高通量测序数据比对软件。由于大多中文教程没能给大家一个完整的说明，有的甚至有错误，我们创建了这个项目来翻译官网的使用说明。我们正在尽最大的努力翻译地更好、更快，希望有更多的朋友加入进来。就算只是一个句子，有时也会产生巨大的影响，就像单个碱基一样。
 
+You can read the Chinese translation of the introduction page of BWA at [here](https://github.com/CNCBI/BWA-Manual-CN/blob/master/Introduction.md).
+你可以在[这里](https://github.com/CNCBI/BWA-Manual-CN/blob/master/Introduction.md)查阅BWA介绍页的中文翻译。
+
 #Translation-译文
 
 ###NAME-名字
