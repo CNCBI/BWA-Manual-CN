@@ -38,7 +38,7 @@
         <blockquote>
             <a href="#1">概要</a><br>
             <a href="#2">描述</a><br>
-            <a href="#3">命令和选项</a><br>
+            <a href="#3">命令和参数</a><br>
             <a href="#4">Sam对比格式</a><br>
             <a href="#5">短序列对比的注意事项</a><br>
             &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;<a href="#6">对比准确度</a><br>
@@ -97,7 +97,7 @@
             </p></blockquote>
         <a name="3">
             
-            <h3>COMMANDS AND OPTIONS - 命令和选项</h3>
+            <h3>COMMANDS AND OPTIONS - 命令和参数</h3>
             
         </a>
         <blockquote>
@@ -184,108 +184,51 @@
                         <i>db.prefix</i> <!-- .I reads.fq -->
                         <i>reads.fq</i> <!-- .RI [ mates.fq ] -->
                         [<i>mates.fq</i>] <p>
-                        Align 70bp-1Mbp query sequences with the BWA-MEM algorithm. Briefly, the
-                        algorithm works by seeding alignments with maximal exact matches (MEMs) and
-                        then extending seeds with the affine-gap Smith-Waterman algorithm (SW).
+                        用BWA-MEM算法比对70 - 1Mbp的查询序列。简单地说，这个算法通过种子比对的到最大完全匹配（MEMs）然后再通过affine-gap Smith-Waterman（SW）算法延伸种子。
                         </p><p>
-                        If
-                        <!-- .I mates.fq -->
-                        <i>mates.fq</i> file is absent and option
-                        <!-- .B -p -->
-                        <b>-p</b> is not set, this command regards input reads are single-end. If
-                        <!-- .I mates.fq -->
-                        <i>mates.fq</i> is present, this command assumes the
-                        <!-- .IR i -th -->
-                        <i>i</i>-th read in
-                        <!-- .I reads.fq -->
-                        <i>reads.fq</i> and the
-                        <!-- .IR i -th -->
-                        <i>i</i>-th read in
-                        <!-- .I mates.fq -->
-                        <i>mates.fq</i> constitute a read pair. If
-                        <!-- .B -p -->
-                        <b>-p</b> is used, the command assumes the
-                        <!-- .RI 2 i -th -->
-                        2<i>i</i>-th and the
-                        <!-- .RI (2 i +1)-th -->
-                        (2<i>i</i>+1)-th read in
-                        <!-- .I reads.fq -->
-                        <i>reads.fq</i> constitute a read pair (such input file is said to be interleaved). In this case,
-                        <!-- .I mates.fq -->
-                        <i>mates.fq</i> is ignored. In the paired-end mode, the
-                        <!-- .B mem -->
-                        <b>mem</b> command will infer the read orientation and the insert size distribution from a
-                        batch of reads.
+                        如果没有输入 <i>mates.fq</i> ，也没有添加 <b>-p</b> 参数，这个命令会把输入的reads视为单端测序的。如果 <i>mates.fq</i> 存在，这个命令会假设 <i>reads.fq</i>里的第 <i>i</i> 个read和 <i>mates.fq</i>里的第 <i>i</i> 个read构成了一个read pair。如果使用了 <b>-p</b> 参数，这个命令会假设 <i>reads.fq</i> 里的第 2<i>i</i> 个和第 (2<i>i</i>+1) 个read是一个read pair（这样的输入文件被称作是交叉的）。在这种情况下，<i>mates.fq</i> 会被忽略。在pair-end模式下，<b>mem</b>命令会通过一批reads去推测read的方向和插入片段的大小的分布。
                         </p><p>
-                        The BWA-MEM algorithm performs local alignment. It may produce multiple primary
-                        alignments for different part of a query sequence. This is a crucial feature
-                        for long sequences. However, some tools such as Picard’s markDuplicates does
-                        not work with split alignments. One may consider to use option
-                        <!-- .B -M -->
-                        <b>-M</b> to flag shorter split hits as secondary.
+                        BWA-MEM算法可以执行局部比对，它可能会为查询序列的不同部分输出多个首选比对（multiple primary alignments）。这对长序列来说至关重要。但是，有一些工具，像Picard的markDuplicates并不能识别剪切比对。你可以考虑使用 <b>-M</b> 参数把较短的剪切标记为次要比对。
                         </p><p>
                         <!-- .B OPTIONS: -->
-                        <b>OPTIONS:</b> <!-- .RS -->
+                        <b>参数：</b> <!-- .RS -->
                         <!-- .TP 10 -->
                         <table width="100%" cellpadding="3"><!-- tsb: <B>OPTIONS:</B>  -->
                             <tbody><tr></tr><tr></tr>
                                 <tr valign="top"><td width="10%" nowrap="">
                                     <!-- .BI -t \ INT -->
                                     <b>-t</b><i> INT</i> </td><td valign="bottom">
-                                        Number of threads [1]
+                                        线程数 [1] （ [ ] 中的内容为默认值）
                                         <!-- .TP -->
                                     </td></tr>
                                 <tr valign="top"><td width="10%" nowrap="">
                                     <!-- .BI -k \ INT -->
                                     <b>-k</b><i> INT</i> </td><td valign="bottom">
-                                        Minimum seed length. Matches shorter than
-                                        <!-- .I INT -->
-                                        <i>INT</i> will be missed. The alignment speed is usually insensitive to this value unless
-                                        it significantly deviates 20. [19]
+                                        最小种子长度。比 <i>INT</i> 小的匹配会被忽略。比对速度通常不会因这个值受太大影响，除非它偏离20太远。 [19]
                                         <!-- .TP -->
                                     </td></tr>
                                 <tr valign="top"><td width="10%" nowrap="">
                                     <!-- .BI -w \ INT -->
                                     <b>-w</b><i> INT</i> </td><td valign="bottom">
-                                        Band width. Essentially, gaps longer than
-                                        <!-- .I INT -->
-                                        <i>INT</i> will not be found. Note that the maximum gap length is also affected by the
-                                        scoring matrix and the hit length, not solely determined by this option. [100]
+                                        带宽。本质上，长度大于INT的gaps是不会被找到的。需要注意的是，gap的最大长度也会受到打分矩阵和完全匹配的长度的影响，并不完全由这一个参数决定。 [100]
                                         <!-- .TP -->
                                     </td></tr>
                                 <tr valign="top"><td width="10%" nowrap="">
                                     <!-- .BI -d \ INT -->
                                     <b>-d</b><i> INT</i> </td><td valign="bottom">
-                                        Off-diagonal X-dropoff (Z-dropoff). Stop extension when the difference between
-                                        the best and the current extension score is above
-                                        <!-- .RI | i - j |* A + INT , -->
-                                        |<i>i</i>-<i>j</i>|*<i>A</i>+<i>INT</i>, where
-                                        <!-- .I i -->
-                                        <i>i</i> and
-                                        <!-- .I j -->
-                                        <i>j</i> are the current positions of the query and reference, respectively, and
-                                        <!-- .I A -->
-                                        <i>A</i> is the matching score. Z-dropoff is similar to BLAST’s X-dropoff except that it
-                                        doesn’t penalize gaps in one of the sequences in the alignment. Z-dropoff not
-                                        only avoids unnecessary extension, but also reduces poor alignments inside a
-                                        long good alignment. [100]
+                                        偏离对角线的X-dropoff (z-dropoff)。当延伸过程中的最佳分数和当前分数的差大于 |<i>i</i>-<i>j</i>|*<i>A</i>+<i>INT</i> 时，停止延伸，其中，<i>i</i> 和 <i>j</i> 分别是查询序列和参考序列的当前位置， <i>A</i> 是匹配分数。Z-dropoff 和BLAST的 X-dropoff 是类似的，不同之处在于，Z-dropoff不对比对中某一条序列上的gaps做罚分处理。Z-dropoff不仅避免了不必要的延伸，同时减少了在一个很长的高质量的比对中的低质量比对的情况。 [100]
                                         <!-- .TP -->
                                     </td></tr>
                                 <tr valign="top"><td width="10%" nowrap="">
                                     <!-- .BI -r \ FLOAT -->
                                     <b>-r</b><i> FLOAT</i> </td><td valign="bottom">
-                                        Trigger re-seeding for a MEM longer than
-                                        <!-- .IR minSeedLen * FLOAT . -->
-                                        <i>minSeedLen</i>*<i>FLOAT</i>. This is a key heuristic parameter for tuning the performance. Larger value
-                                        yields fewer seeds, which leads to faster alignment speed but lower accuracy. [1.5]
+                                        当一个MEM长于最低种子长度*<i>FLOAT</i>时，触发新的种子匹配。对调节性能来说，这是一个关键的参数。比较大的值会产生更少的种子，会让比对速度更快，但准确率却会降低。 [1.5]
                                         <!-- .TP -->
                                     </td></tr>
                                 <tr valign="top"><td width="10%" nowrap="">
                                     <!-- .BI -c \ INT -->
                                     <b>-c</b><i> INT</i> </td><td valign="bottom">
-                                        Discard a MEM if it has more than
-                                        <!-- .I INT -->
-                                        <i>INT</i> occurence in the genome. This is an insensitive parameter. [10000]
+                                        如果一个MEM在基因组上出现的次数超过了 <i>INT</i> ，它会被丢弃。这是一个不敏感的参数。 [10000]
                                         <!-- .TP -->
                                     </td></tr>
                                 <tr valign="top"><td width="10%" nowrap="">
