@@ -8,6 +8,8 @@
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    
+
   </head>
   <body>
     <section class="page-header">
@@ -77,6 +79,1191 @@ IS线性时间算法来创建数组后缀。这需要5.37N的内存，N是databa
 BWT-SW中实现的算法，这个方法可以对人类全基因组建立索引。</p>
 
 <p><strong>mem</strong><code>bwa mem [-aCHMpP] [-t nThreads] [-k minSeedLen] [-w bandWidth] [-d zDropoff] [-r seedSplitRatio] [-c maxOcc] [-A matchScore] [-B mmPenalty] [-O gapOpenPen] [-E gapExtPen] [-L clipPen] [-U unpairPen] [-R RGline] [-v verboseLevel] db.prefix reads.fq [mates.fq]</code></p>
+
+
+<!-- 英文原文 开始 -->
+    <div id="wrap"><a name="top"></a>
+        <!-- .SH NAME -->
+        <a name="0">
+            
+            <h3>NAME</h3>
+            
+        </a>
+        <blockquote>
+            <!-- .PP -->
+            <p>
+            bwa - Burrows-Wheeler Alignment Tool
+            <!-- .SH SYNOPSIS -->
+            </p></blockquote>
+        <a name="contents"></a><h3>CONTENTS</h3>
+        <blockquote>
+            <a href="#1">Synopsis</a><br>
+            <a href="#2">Description</a><br>
+            <a href="#3">Commands And Options</a><br>
+            <a href="#4">Sam Alignment Format</a><br>
+            <a href="#5">Notes On Short-read Alignment</a><br>
+            &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;<a href="#6">Alignment Accuracy</a><br>
+            &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;<a href="#7">Estimating Insert Size Distribution</a><br>
+            &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;<a href="#8">Memory Requirement</a><br>
+            &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;<a href="#9">Speed</a><br>
+            <a href="#10">Changes In Bwa-0.6</a><br>
+            <a href="#11">See Also</a><br>
+            <a href="#12">Author</a><br>
+            <a href="#13">License And Citation</a><br>
+            <a href="#14">History</a><br>
+        </blockquote>
+        <a name="15">
+            
+            <h3>SYNOPSIS</h3>
+            
+        </a>
+        <blockquote>
+            <!-- .PP -->
+            <p>
+            bwa index ref.fa
+            <!-- .PP -->
+            </p><p>
+            bwa mem ref.fa reads.fq &gt; aln-se.sam
+            <!-- .PP -->
+            </p><p>
+            bwa mem ref.fa read1.fq read2.fq &gt; aln-pe.sam
+            <!-- .PP -->
+            </p><p>
+            bwa aln ref.fa short_read.fq &gt; aln_sa.sai
+            <!-- .PP -->
+            </p><p>
+            bwa samse ref.fa aln_sa.sai short_read.fq &gt; aln-se.sam
+            <!-- .PP -->
+            </p><p>
+            bwa sampe ref.fa aln_sa1.sai aln_sa2.sai read1.fq read2.fq &gt; aln-pe.sam
+            <!-- .PP -->
+            </p><p>
+            bwa bwasw ref.fa long_read.fq &gt; aln.sam
+            </p><p>
+            <!-- .SH DESCRIPTION -->
+            </p></blockquote>
+        <a name="2">
+            
+            <h3>DESCRIPTION</h3>
+            
+        </a>
+        <blockquote>
+            <!-- .PP -->
+            <p>
+            BWA is a software package for mapping low-divergent sequences against a large
+            reference genome, such as the human genome. It consists of three algorithms:
+            BWA-backtrack, BWA-SW and BWA-MEM. The first algorithm is designed for Illumina
+            sequence reads up to 100bp, while the rest two for longer sequences ranged from
+            70bp to 1Mbp. BWA-MEM and BWA-SW share similar features such as long-read
+            support and split alignment, but BWA-MEM, which is the latest, is generally
+            recommended for high-quality queries as it is faster and more accurate.
+            BWA-MEM also has better performance than BWA-backtrack for 70-100bp Illumina
+            reads.
+            </p><p>
+            For all the algorithms, BWA first needs to construct the FM-index for
+            the reference genome (the
+            <!-- .B index -->
+            <b>index</b> command). Alignment algorithms are invoked with different sub-commands:
+            <!-- .BR aln / samse / sampe -->
+            <b>aln</b>/<b>samse</b>/<b>sampe</b> for BWA-backtrack,
+            <!-- .B bwasw -->
+            <b>bwasw</b> for BWA-SW and
+            <!-- .B mem -->
+            <b>mem</b> for the BWA-MEM algorithm.
+            </p><p>
+            <!-- .SH COMMANDS AND OPTIONS -->
+            </p></blockquote>
+        <a name="3">
+            
+            <h3>COMMANDS AND OPTIONS</h3>
+            
+        </a>
+        <blockquote>
+            <!-- .TP -->
+            <table cellpadding="3">
+                <tbody><tr valign="top"><td width="6%" nowrap="">
+                    <!-- .B index -->
+                    <b>index</b> </td><td valign="bottom">
+                        bwa index [-p prefix] [-a algoType] &lt;in.db.fasta&gt;
+                        <p>
+                        Index database sequences in the FASTA format.
+                        </p><p>
+                        <!-- .B OPTIONS: -->
+                        <b>OPTIONS:</b> <!-- .RS -->
+                        <!-- .TP 10 -->
+                        <table width="100%" cellpadding="3"><!-- tsb: <B>OPTIONS:</B>  -->
+                            <tbody><tr></tr><tr></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -p \ STR -->
+                                    <b>-p</b><i> STR</i> </td><td valign="bottom">
+                                        Prefix of the output database [same as db filename]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -a \ STR -->
+                                    <b>-a</b><i> STR</i> </td><td valign="bottom">
+                                        Algorithm for constructing BWT index. Available options are:
+                                        <!-- .RS -->
+                                        <!-- .TP -->
+                                        <table width="100%" cellpadding="3"><!-- tsb: Algorithm for constructing BWT index. Available options are:
+                                                                             -->
+                                        <tbody><tr></tr><tr></tr>
+                                            <tr valign="top"><td width="6%" nowrap="">
+                                                <!-- .B is -->
+                                                <b>is</b> </td><td valign="bottom">
+                                                    IS linear-time algorithm for constructing suffix array. It requires
+                                                    5.37N memory where N is the size of the database. IS is moderately fast,
+                                                    but does not work with database larger than 2GB. IS is the default
+                                                    algorithm due to its simplicity. The current codes for IS algorithm are
+                                                    reimplemented by Yuta Mori.
+                                                    <!-- .TP -->
+                                                </td></tr>
+                                            <tr valign="top"><td width="6%" nowrap="">
+                                                <!-- .B bwtsw -->
+                                                <b>bwtsw</b> </td><td valign="bottom">
+                                                    Algorithm implemented in BWT-SW. This method works with the whole human
+                                                    genome.
+                                                    <!-- .RE -->
+                                                </td></tr>
+                                            <tr></tr></tbody></table><!-- .RE -->
+                                    </td></tr>
+                                <tr></tr></tbody></table></p><p>
+                        <!-- .TP -->
+                        </p></td></tr>
+                <tr valign="top"><td width="6%" nowrap="">
+                    <!-- .B mem -->
+                    <b>mem</b> </td><td valign="bottom">
+                        <!-- .B bwa mem -->
+                        <b>bwa mem</b> <!-- .RB [ -aCHMpP ] -->
+                        [<b>-aCHMpP</b>] <!-- .RB [ -t -->
+                        [<b>-t</b> <!-- .IR nThreads ] -->
+                        <i>nThreads</i>] <!-- .RB [ -k -->
+                        [<b>-k</b> <!-- .IR minSeedLen ] -->
+                        <i>minSeedLen</i>] <!-- .RB [ -w -->
+                        [<b>-w</b> <!-- .IR bandWidth ] -->
+                        <i>bandWidth</i>] <!-- .RB [ -d -->
+                        [<b>-d</b> <!-- .IR zDropoff ] -->
+                        <i>zDropoff</i>] <!-- .RB [ -r -->
+                        [<b>-r</b> <!-- .IR seedSplitRatio ] -->
+                        <i>seedSplitRatio</i>] <!-- .RB [ -c -->
+                        [<b>-c</b> <!-- .IR maxOcc ] -->
+                        <i>maxOcc</i>] <!-- .RB [ -A -->
+                        [<b>-A</b> <!-- .IR matchScore ] -->
+                        <i>matchScore</i>] <!-- .RB [ -B -->
+                        [<b>-B</b> <!-- .IR mmPenalty ] -->
+                        <i>mmPenalty</i>] <!-- .RB [ -O -->
+                        [<b>-O</b> <!-- .IR gapOpenPen ] -->
+                        <i>gapOpenPen</i>] <!-- .RB [ -E -->
+                        [<b>-E</b> <!-- .IR gapExtPen ] -->
+                        <i>gapExtPen</i>] <!-- .RB [ -L -->
+                        [<b>-L</b> <!-- .IR clipPen ] -->
+                        <i>clipPen</i>] <!-- .RB [ -U -->
+                        [<b>-U</b> <!-- .IR unpairPen ] -->
+                        <i>unpairPen</i>] <!-- .RB [ -R -->
+                        [<b>-R</b> <!-- .IR RGline ] -->
+                        <i>RGline</i>] <!-- .RB [ -v -->
+                        [<b>-v</b> <!-- .IR verboseLevel ] -->
+                        <i>verboseLevel</i>] <!-- .I db.prefix -->
+                        <i>db.prefix</i> <!-- .I reads.fq -->
+                        <i>reads.fq</i> <!-- .RI [ mates.fq ] -->
+                        [<i>mates.fq</i>] <p>
+                        Align 70bp-1Mbp query sequences with the BWA-MEM algorithm. Briefly, the
+                        algorithm works by seeding alignments with maximal exact matches (MEMs) and
+                        then extending seeds with the affine-gap Smith-Waterman algorithm (SW).
+                        </p><p>
+                        If
+                        <!-- .I mates.fq -->
+                        <i>mates.fq</i> file is absent and option
+                        <!-- .B -p -->
+                        <b>-p</b> is not set, this command regards input reads are single-end. If
+                        <!-- .I mates.fq -->
+                        <i>mates.fq</i> is present, this command assumes the
+                        <!-- .IR i -th -->
+                        <i>i</i>-th read in
+                        <!-- .I reads.fq -->
+                        <i>reads.fq</i> and the
+                        <!-- .IR i -th -->
+                        <i>i</i>-th read in
+                        <!-- .I mates.fq -->
+                        <i>mates.fq</i> constitute a read pair. If
+                        <!-- .B -p -->
+                        <b>-p</b> is used, the command assumes the
+                        <!-- .RI 2 i -th -->
+                        2<i>i</i>-th and the
+                        <!-- .RI (2 i +1)-th -->
+                        (2<i>i</i>+1)-th read in
+                        <!-- .I reads.fq -->
+                        <i>reads.fq</i> constitute a read pair (such input file is said to be interleaved). In this case,
+                        <!-- .I mates.fq -->
+                        <i>mates.fq</i> is ignored. In the paired-end mode, the
+                        <!-- .B mem -->
+                        <b>mem</b> command will infer the read orientation and the insert size distribution from a
+                        batch of reads.
+                        </p><p>
+                        The BWA-MEM algorithm performs local alignment. It may produce multiple primary
+                        alignments for different part of a query sequence. This is a crucial feature
+                        for long sequences. However, some tools such as Picard’s markDuplicates does
+                        not work with split alignments. One may consider to use option
+                        <!-- .B -M -->
+                        <b>-M</b> to flag shorter split hits as secondary.
+                        </p><p>
+                        <!-- .B OPTIONS: -->
+                        <b>OPTIONS:</b> <!-- .RS -->
+                        <!-- .TP 10 -->
+                        <table width="100%" cellpadding="3"><!-- tsb: <B>OPTIONS:</B>  -->
+                            <tbody><tr></tr><tr></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -t \ INT -->
+                                    <b>-t</b><i> INT</i> </td><td valign="bottom">
+                                        Number of threads [1]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -k \ INT -->
+                                    <b>-k</b><i> INT</i> </td><td valign="bottom">
+                                        Minimum seed length. Matches shorter than
+                                        <!-- .I INT -->
+                                        <i>INT</i> will be missed. The alignment speed is usually insensitive to this value unless
+                                        it significantly deviates 20. [19]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -w \ INT -->
+                                    <b>-w</b><i> INT</i> </td><td valign="bottom">
+                                        Band width. Essentially, gaps longer than
+                                        <!-- .I INT -->
+                                        <i>INT</i> will not be found. Note that the maximum gap length is also affected by the
+                                        scoring matrix and the hit length, not solely determined by this option. [100]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -d \ INT -->
+                                    <b>-d</b><i> INT</i> </td><td valign="bottom">
+                                        Off-diagonal X-dropoff (Z-dropoff). Stop extension when the difference between
+                                        the best and the current extension score is above
+                                        <!-- .RI | i - j |* A + INT , -->
+                                        |<i>i</i>-<i>j</i>|*<i>A</i>+<i>INT</i>, where
+                                        <!-- .I i -->
+                                        <i>i</i> and
+                                        <!-- .I j -->
+                                        <i>j</i> are the current positions of the query and reference, respectively, and
+                                        <!-- .I A -->
+                                        <i>A</i> is the matching score. Z-dropoff is similar to BLAST’s X-dropoff except that it
+                                        doesn’t penalize gaps in one of the sequences in the alignment. Z-dropoff not
+                                        only avoids unnecessary extension, but also reduces poor alignments inside a
+                                        long good alignment. [100]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -r \ FLOAT -->
+                                    <b>-r</b><i> FLOAT</i> </td><td valign="bottom">
+                                        Trigger re-seeding for a MEM longer than
+                                        <!-- .IR minSeedLen * FLOAT . -->
+                                        <i>minSeedLen</i>*<i>FLOAT</i>. This is a key heuristic parameter for tuning the performance. Larger value
+                                        yields fewer seeds, which leads to faster alignment speed but lower accuracy. [1.5]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -c \ INT -->
+                                    <b>-c</b><i> INT</i> </td><td valign="bottom">
+                                        Discard a MEM if it has more than
+                                        <!-- .I INT -->
+                                        <i>INT</i> occurence in the genome. This is an insensitive parameter. [10000]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .B -P -->
+                                    <b>-P</b> </td><td valign="bottom">
+                                        In the paired-end mode, perform SW to rescue missing hits only but do not try to find
+                                        hits that fit a proper pair.
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -A \ INT -->
+                                    <b>-A</b><i> INT</i> </td><td valign="bottom">
+                                        Matching score. [1]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -B \ INT -->
+                                    <b>-B</b><i> INT</i> </td><td valign="bottom">
+                                        Mismatch penalty. The sequence error rate is approximately: {.75 * exp[-log(4) * B/A]}. [4]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -O \ INT -->
+                                    <b>-O</b><i> INT</i> </td><td valign="bottom">
+                                        Gap open penalty. [6]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -E \ INT -->
+                                    <b>-E</b><i> INT</i> </td><td valign="bottom">
+                                        Gap extension penalty. A gap of length k costs O + k*E (i.e.
+                                        <!-- .B -O -->
+                                        <b>-O</b> is for opening a zero-length gap). [1]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -L \ INT -->
+                                    <b>-L</b><i> INT</i> </td><td valign="bottom">
+                                        Clipping penalty. When performing SW extension, BWA-MEM keeps track of the best
+                                        score reaching the end of query. If this score is larger than the best SW score
+                                        minus the clipping penalty, clipping will not be applied. Note that in this
+                                        case, the SAM AS tag reports the best SW score; clipping penalty is not
+                                        deducted. [5]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -U \ INT -->
+                                    <b>-U</b><i> INT</i> </td><td valign="bottom">
+                                        Penalty for an unpaired read pair. BWA-MEM scores an unpaired read pair as
+                                        <!-- .RI scoreRead1+scoreRead2- INT -->
+                                        scoreRead1+scoreRead2-<i>INT</i> and scores a paired as scoreRead1+scoreRead2-insertPenalty. It compares these
+                                        two scores to determine whether we should force pairing. [9]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .B -p -->
+                                    <b>-p</b> </td><td valign="bottom">
+                                        Assume the first input query file is interleaved paired-end FASTA/Q. See the command description for details.
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -R \ STR -->
+                                    <b>-R</b><i> STR</i> </td><td valign="bottom">
+                                        Complete read group header line. ’\t’ can be used in
+                                        <!-- .I STR -->
+                                        <i>STR</i> and will be converted to a TAB in the output SAM. The read group ID will be
+                                        attached to every read in the output. An example is ’@RG\tID:foo\tSM:bar’.
+                                        [null]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -T \ INT -->
+                                    <b>-T</b><i> INT</i> </td><td valign="bottom">
+                                        Don’t output alignment with score lower than
+                                        <!-- .IR INT . -->
+                                        <i>INT</i>. This option only affects output. [30]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .B -a -->
+                                    <b>-a</b> </td><td valign="bottom">
+                                        Output all found alignments for single-end or unpaired paired-end reads. These
+                                        alignments will be flagged as secondary alignments.
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .B -C -->
+                                    <b>-C</b> </td><td valign="bottom">
+                                        Append append FASTA/Q comment to SAM output. This option can be used to
+                                        transfer read meta information (e.g. barcode) to the SAM output. Note that the
+                                        FASTA/Q comment (the string after a space in the header line) must conform the SAM
+                                        spec (e.g. BC:Z:CGTAC). Malformated comments lead to incorrect SAM output.
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .B -H -->
+                                    <b>-H</b> </td><td valign="bottom">
+                                        Use hard clipping ’H’ in the SAM output. This option may dramatically reduce
+                                        the redundancy of output when mapping long contig or BAC sequences.
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .B -M -->
+                                    <b>-M</b> </td><td valign="bottom">
+                                        Mark shorter split hits as secondary (for Picard compatibility).
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -v \ INT -->
+                                    <b>-v</b><i> INT</i> </td><td valign="bottom">
+                                        Control the verbose level of the output. This option has not been fully
+                                        supported throughout BWA. Ideally, a value 0 for disabling all the output to
+                                        stderr; 1 for outputting errors only; 2 for warnings and errors; 3 for
+                                        all normal messages; 4 or higher for debugging. When this option takes value
+                                        4, the output is not SAM. [3]
+                                        <!-- .RE -->
+                                    </td></tr>
+                                <tr></tr></tbody></table></p><p>
+                        <!-- .TP -->
+                        </p></td></tr>
+                <tr valign="top"><td width="10%" nowrap="">
+                    <!-- .B aln -->
+                    <b>aln</b> </td><td valign="bottom">
+                        bwa aln [-n maxDiff] [-o maxGapO] [-e maxGapE] [-d nDelTail] [-i
+                        nIndelEnd] [-k maxSeedDiff] [-l seedLen] [-t nThrds] [-cRN] [-M misMsc]
+                        [-O gapOsc] [-E gapEsc] [-q trimQual] &lt;in.db.fasta&gt; &lt;in.query.fq&gt; &gt;
+                        &lt;out.sai&gt;
+                        <p>
+                        Find the SA coordinates of the input reads. Maximum
+                        <!-- .I maxSeedDiff -->
+                        <i>maxSeedDiff</i> differences are allowed in the first
+                        <!-- .I seedLen -->
+                        <i>seedLen</i> subsequence and maximum
+                        <!-- .I maxDiff -->
+                        <i>maxDiff</i> differences are allowed in the whole sequence.
+                        </p><p>
+                        <!-- .B OPTIONS: -->
+                        <b>OPTIONS:</b> <!-- .RS -->
+                        <!-- .TP 10 -->
+                        <table width="100%" cellpadding="3"><!-- tsb: <B>OPTIONS:</B>  -->
+                            <tbody><tr></tr><tr></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -n \ NUM -->
+                                    <b>-n</b><i> NUM</i> </td><td valign="bottom">
+                                        Maximum edit distance if the value is INT, or the fraction of missing
+                                        alignments given 2% uniform base error rate if FLOAT. In the latter
+                                        case, the maximum edit distance is automatically chosen for different
+                                        read lengths. [0.04]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -o \ INT -->
+                                    <b>-o</b><i> INT</i> </td><td valign="bottom">
+                                        Maximum number of gap opens [1]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -e \ INT -->
+                                    <b>-e</b><i> INT</i> </td><td valign="bottom">
+                                        Maximum number of gap extensions, -1 for k-difference mode (disallowing
+                                        long gaps) [-1]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -d \ INT -->
+                                    <b>-d</b><i> INT</i> </td><td valign="bottom">
+                                        Disallow a long deletion within INT bp towards the 3’-end [16]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -i \ INT -->
+                                    <b>-i</b><i> INT</i> </td><td valign="bottom">
+                                        Disallow an indel within INT bp towards the ends [5]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -l \ INT -->
+                                    <b>-l</b><i> INT</i> </td><td valign="bottom">
+                                        Take the first INT subsequence as seed. If INT is larger than the query
+                                        sequence, seeding will be disabled. For long reads, this option is
+                                        typically ranged from 25 to 35 for ‘-k 2’. [inf]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -k \ INT -->
+                                    <b>-k</b><i> INT</i> </td><td valign="bottom">
+                                        Maximum edit distance in the seed [2]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -t \ INT -->
+                                    <b>-t</b><i> INT</i> </td><td valign="bottom">
+                                        Number of threads (multi-threading mode) [1]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -M \ INT -->
+                                    <b>-M</b><i> INT</i> </td><td valign="bottom">
+                                        Mismatch penalty. BWA will not search for suboptimal hits with a score
+                                        lower than (bestScore-misMsc). [3]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -O \ INT -->
+                                    <b>-O</b><i> INT</i> </td><td valign="bottom">
+                                        Gap open penalty [11]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -E \ INT -->
+                                    <b>-E</b><i> INT</i> </td><td valign="bottom">
+                                        Gap extension penalty [4]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -R \ INT -->
+                                    <b>-R</b><i> INT</i> </td><td valign="bottom">
+                                        Proceed with suboptimal alignments if there are no more than INT equally
+                                        best hits. This option only affects paired-end mapping. Increasing this
+                                        threshold helps to improve the pairing accuracy at the cost of speed,
+                                        especially for short reads (~32bp).
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .B -c -->
+                                    <b>-c</b> </td><td valign="bottom">
+                                        Reverse query but not complement it, which is required for alignment in
+                                        the color space. (Disabled since 0.6.x)
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .B -N -->
+                                    <b>-N</b> </td><td valign="bottom">
+                                        Disable iterative search. All hits with no more than
+                                        <!-- .I maxDiff -->
+                                        <i>maxDiff</i> differences will be found. This mode is much slower than the default.
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -q \ INT -->
+                                    <b>-q</b><i> INT</i> </td><td valign="bottom">
+                                        Parameter for read trimming. BWA trims a read down to
+                                        argmax_x{\sum_{i=x+1}^l(INT-q_i)} if q_l&lt;INT where l is the original
+                                        read length. [0]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .B -I -->
+                                    <b>-I</b> </td><td valign="bottom">
+                                        The input is in the Illumina 1.3+ read format (quality equals ASCII-64).
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -B \ INT -->
+                                    <b>-B</b><i> INT</i> </td><td valign="bottom">
+                                        Length of barcode starting from the 5’-end. When
+                                        <!-- .I INT -->
+                                        <i>INT</i> is positive, the barcode of each read will be trimmed before mapping and will
+                                        be written at the
+                                        <!-- .B BC -->
+                                        <b>BC</b> SAM tag. For paired-end reads, the barcode from both ends are concatenated. [0]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .B -b -->
+                                    <b>-b</b> </td><td valign="bottom">
+                                        Specify the input read sequence file is the BAM format. For paired-end
+                                        data, two ends in a pair must be grouped together and options
+                                        <!-- .B -1 -->
+                                        <b>-1</b> or
+                                        <!-- .B -2 -->
+                                        <b>-2</b> are usually applied to specify which end should be mapped. Typical
+                                        command lines for mapping pair-end data in the BAM format are:
+                                        <p>
+                                        bwa aln ref.fa -b1 reads.bam &gt; 1.sai
+                                        <br>
+                                        bwa aln ref.fa -b2 reads.bam &gt; 2.sai
+                                        <br>
+                                        bwa sampe ref.fa 1.sai 2.sai reads.bam reads.bam &gt; aln.sam
+                                        <!-- .TP -->
+                                        </p></td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .B -0 -->
+                                    <b>-0</b> </td><td valign="bottom">
+                                        When
+                                        <!-- .B -b -->
+                                        <b>-b</b> is specified, only use single-end reads in mapping.
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .B -1 -->
+                                    <b>-1</b> </td><td valign="bottom">
+                                        When
+                                        <!-- .B -b -->
+                                        <b>-b</b> is specified, only use the first read in a read pair in mapping (skip
+                                        single-end reads and the second reads).
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .B -2 -->
+                                    <b>-2</b> </td><td valign="bottom">
+                                        When
+                                        <!-- .B -b -->
+                                        <b>-b</b> is specified, only use the second read in a read pair in mapping.
+                                        <!-- .B -->
+                                        <b></b> <!-- .RE -->
+                                    </td></tr>
+                                <tr></tr></tbody></table></p><p>
+                        <!-- .TP -->
+                        </p></td></tr>
+                <tr valign="top"><td width="10%" nowrap="">
+                    <!-- .B samse -->
+                    <b>samse</b> </td><td valign="bottom">
+                        bwa samse [-n maxOcc] &lt;in.db.fasta&gt; &lt;in.sai&gt; &lt;in.fq&gt; &gt; &lt;out.sam&gt;
+                        <p>
+                        Generate alignments in the SAM format given single-end reads. Repetitive
+                        hits will be randomly chosen.
+                        </p><p>
+                        <!-- .B OPTIONS: -->
+                        <b>OPTIONS:</b> <!-- .RS -->
+                        <!-- .TP 10 -->
+                        <table width="100%" cellpadding="3"><!-- tsb: <B>OPTIONS:</B>  -->
+                            <tbody><tr></tr><tr></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -n \ INT -->
+                                    <b>-n</b><i> INT</i> </td><td valign="bottom">
+                                        Maximum number of alignments to output in the XA tag for reads paired
+                                        properly. If a read has more than INT hits, the XA tag will not be
+                                        written. [3]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -r \ STR -->
+                                    <b>-r</b><i> STR</i> </td><td valign="bottom">
+                                        Specify the read group in a format like ‘@RG\tID:foo\tSM:bar’. [null]
+                                        <!-- .RE -->
+                                    </td></tr>
+                                <tr></tr></tbody></table></p><p>
+                        <!-- .TP -->
+                        </p></td></tr>
+                <tr valign="top"><td width="10%" nowrap="">
+                    <!-- .B sampe -->
+                    <b>sampe</b> </td><td valign="bottom">
+                        bwa sampe [-a maxInsSize] [-o maxOcc] [-n maxHitPaired] [-N maxHitDis]
+                        [-P] &lt;in.db.fasta&gt; &lt;in1.sai&gt; &lt;in2.sai&gt; &lt;in1.fq&gt; &lt;in2.fq&gt; &gt; &lt;out.sam&gt;
+                        <p>
+                        Generate alignments in the SAM format given paired-end reads. Repetitive
+                        read pairs will be placed randomly.
+                        </p><p>
+                        <!-- .B OPTIONS: -->
+                        <b>OPTIONS:</b> <!-- .RS -->
+                        <!-- .TP 8 -->
+                        <table width="100%" cellpadding="3"><!-- tsb: <B>OPTIONS:</B>  -->
+                            <tbody><tr></tr><tr></tr>
+                                <tr valign="top"><td width="8%" nowrap="">
+                                    <!-- .BI -a \ INT -->
+                                    <b>-a</b><i> INT</i> </td><td valign="bottom">
+                                        Maximum insert size for a read pair to be considered being mapped
+                                        properly. Since 0.4.5, this option is only used when there are not
+                                        enough good alignment to infer the distribution of insert sizes. [500]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="8%" nowrap="">
+                                    <!-- .BI -o \ INT -->
+                                    <b>-o</b><i> INT</i> </td><td valign="bottom">
+                                        Maximum occurrences of a read for pairing. A read with more occurrneces
+                                        will be treated as a single-end read. Reducing this parameter helps
+                                        faster pairing. [100000]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="8%" nowrap="">
+                                    <!-- .B -P -->
+                                    <b>-P</b> </td><td valign="bottom">
+                                        Load the entire FM-index into memory to reduce disk operations
+                                        (base-space reads only). With this option, at least 1.25N bytes of
+                                        memory are required, where N is the length of the genome.
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="8%" nowrap="">
+                                    <!-- .BI -n \ INT -->
+                                    <b>-n</b><i> INT</i> </td><td valign="bottom">
+                                        Maximum number of alignments to output in the XA tag for reads paired
+                                        properly. If a read has more than INT hits, the XA tag will not be
+                                        written. [3]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="8%" nowrap="">
+                                    <!-- .BI -N \ INT -->
+                                    <b>-N</b><i> INT</i> </td><td valign="bottom">
+                                        Maximum number of alignments to output in the XA tag for disconcordant
+                                        read pairs (excluding singletons). If a read has more than INT hits, the
+                                        XA tag will not be written. [10]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="8%" nowrap="">
+                                    <!-- .BI -r \ STR -->
+                                    <b>-r</b><i> STR</i> </td><td valign="bottom">
+                                        Specify the read group in a format like ‘@RG\tID:foo\tSM:bar’. [null]
+                                        <!-- .RE -->
+                                    </td></tr>
+                                <tr></tr></tbody></table></p><p>
+                        <!-- .TP -->
+                        </p></td></tr>
+                <tr valign="top"><td width="8%" nowrap="">
+                    <!-- .B bwasw -->
+                    <b>bwasw</b> </td><td valign="bottom">
+                        bwa bwasw [-a matchScore] [-b mmPen] [-q gapOpenPen] [-r gapExtPen] [-t
+                        nThreads] [-w bandWidth] [-T thres] [-s hspIntv] [-z zBest] [-N
+                        nHspRev] [-c thresCoef] &lt;in.db.fasta&gt; &lt;in.fq&gt; [mate.fq]
+                        <p>
+                        Align query sequences in the
+                        <!-- .I in.fq -->
+                        <i>in.fq</i> file. When
+                        <!-- .I mate.fq -->
+                        <i>mate.fq</i> is present, perform paired-end alignment. The paired-end mode only works
+                        for reads Illumina short-insert libraries. In the paired-end mode, BWA-SW
+                        may still output split alignments but they are all marked as not properly
+                        paired; the mate positions will not be written if the mate has multiple
+                        local hits.
+                        </p><p>
+                        <!-- .B OPTIONS: -->
+                        <b>OPTIONS:</b> <!-- .RS -->
+                        <!-- .TP 10 -->
+                        <table width="100%" cellpadding="3"><!-- tsb: <B>OPTIONS:</B>  -->
+                            <tbody><tr></tr><tr></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -a \ INT -->
+                                    <b>-a</b><i> INT</i> </td><td valign="bottom">
+                                        Score of a match [1]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -b \ INT -->
+                                    <b>-b</b><i> INT</i> </td><td valign="bottom">
+                                        Mismatch penalty [3]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -q \ INT -->
+                                    <b>-q</b><i> INT</i> </td><td valign="bottom">
+                                        Gap open penalty [5]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -r \ INT -->
+                                    <b>-r</b><i> INT</i> </td><td valign="bottom">
+                                        Gap extension penalty. The penalty for a contiguous gap of size k is
+                                        q+k*r. [2]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -t \ INT -->
+                                    <b>-t</b><i> INT</i> </td><td valign="bottom">
+                                        Number of threads in the multi-threading mode [1]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -w \ INT -->
+                                    <b>-w</b><i> INT</i> </td><td valign="bottom">
+                                        Band width in the banded alignment [33]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -T \ INT -->
+                                    <b>-T</b><i> INT</i> </td><td valign="bottom">
+                                        Minimum score threshold divided by a [37]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -c \ FLOAT -->
+                                    <b>-c</b><i> FLOAT</i> </td><td valign="bottom">
+                                        Coefficient for threshold adjustment according to query length. Given an
+                                        l-long query, the threshold for a hit to be retained is
+                                        a*max{T,c*log(l)}. [5.5]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -z \ INT -->
+                                    <b>-z</b><i> INT</i> </td><td valign="bottom">
+                                        Z-best heuristics. Higher -z increases accuracy at the cost of speed. [1]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -s \ INT -->
+                                    <b>-s</b><i> INT</i> </td><td valign="bottom">
+                                        Maximum SA interval size for initiating a seed. Higher -s increases
+                                        accuracy at the cost of speed. [3]
+                                        <!-- .TP -->
+                                    </td></tr>
+                                <tr valign="top"><td width="10%" nowrap="">
+                                    <!-- .BI -N \ INT -->
+                                    <b>-N</b><i> INT</i> </td><td valign="bottom">
+                                        Minimum number of seeds supporting the resultant alignment to skip
+                                        reverse alignment. [5]
+                                        <!-- .RE -->
+                                    </td></tr>
+                                <tr></tr></tbody></table></p><p>
+                        <!-- .SH SAM ALIGNMENT FORMAT -->
+                        </p></td></tr>
+                <tr></tr></tbody></table></blockquote>
+        <a name="4">
+            
+            <h3>SAM ALIGNMENT FORMAT</h3>
+            
+        </a>
+        <blockquote>
+            <!-- .PP -->
+            <p>
+            The output of the
+            <!-- .B `aln' -->
+            <b>‘aln’</b> command is binary and designed for BWA use only. BWA outputs the final
+            alignment in the SAM (Sequence Alignment/Map) format. Each line consists
+            of:
+            </p><p>
+            <!-- .TS -->
+            </p><p></p><blockquote><div id="tbl"><table cellspacing="1">
+                <!-- center box; -->
+                <!-- cb | cb | cb -->
+                <!-- n | l | l . -->
+                <tbody><tr valign="top">
+                    <td align="center"><b>Col</b></td><td align="center"><b>Field</b></td><td align="center"><b>Description</b></td></tr>
+                <tr></tr><tr></tr>
+                <tr valign="top">
+                    <td align="right">1</td><td>QNAME</td><td>Query (pair) NAME</td></tr>
+                <tr valign="top">
+                    <td align="right">2</td><td>FLAG</td><td>bitwise FLAG</td></tr>
+                <tr valign="top">
+                    <td align="right">3</td><td>RNAME</td><td>Reference sequence NAME</td></tr>
+                <tr valign="top">
+                    <td align="right">4</td><td>POS</td><td>1-based leftmost POSition/coordinate of clipped sequence</td></tr>
+                <tr valign="top">
+                    <td align="right">5</td><td>MAPQ</td><td>MAPping Quality (Phred-scaled)</td></tr>
+                <tr valign="top">
+                    <td align="right">6</td><td>CIAGR</td><td>extended CIGAR string</td></tr>
+                <tr valign="top">
+                    <td align="right">7</td><td>MRNM</td><td>Mate Reference sequence NaMe (‘=’ if same as RNAME)</td></tr>
+                <tr valign="top">
+                    <td align="right">8</td><td>MPOS</td><td>1-based Mate POSistion</td></tr>
+                <tr valign="top">
+                    <td align="right">9</td><td>ISIZE</td><td>Inferred insert SIZE</td></tr>
+                <tr valign="top">
+                    <td align="right">10</td><td>SEQ</td><td>query SEQuence on the same strand as the reference</td></tr>
+                <tr valign="top">
+                    <td align="right">11</td><td>QUAL</td><td>query QUALity (ASCII-33 gives the Phred base quality)</td></tr>
+                <tr valign="top">
+                    <td align="right">12</td><td>OPT</td><td>variable OPTional fields in the format TAG:VTYPE:VALUE</td></tr>
+                </tbody></table></div></blockquote>
+            <p>
+            <!-- .PP -->
+            </p><p>
+            Each bit in the FLAG field is defined as:
+            </p><p>
+            <!-- .TS -->
+            </p><p></p><blockquote><div id="tbl"><table cellspacing="1">
+                <!-- center box; -->
+                <!-- cb | cb | cb -->
+                <!-- c | l | l . -->
+                <tbody><tr valign="top">
+                    <td align="center"><b>Chr</b></td><td align="center"><b>Flag</b></td><td align="center"><b>Description</b></td></tr>
+                <tr></tr><tr></tr>
+                <tr valign="top">
+                    <td align="center">p</td><td>0x0001</td><td>the read is paired in sequencing</td></tr>
+                <tr valign="top">
+                    <td align="center">P</td><td>0x0002</td><td>the read is mapped in a proper pair</td></tr>
+                <tr valign="top">
+                    <td align="center">u</td><td>0x0004</td><td>the query sequence itself is unmapped</td></tr>
+                <tr valign="top">
+                    <td align="center">U</td><td>0x0008</td><td>the mate is unmapped</td></tr>
+                <tr valign="top">
+                    <td align="center">r</td><td>0x0010</td><td>strand of the query (1 for reverse)</td></tr>
+                <tr valign="top">
+                    <td align="center">R</td><td>0x0020</td><td>strand of the mate</td></tr>
+                <tr valign="top">
+                    <td align="center">1</td><td>0x0040</td><td>the read is the first read in a pair</td></tr>
+                <tr valign="top">
+                    <td align="center">2</td><td>0x0080</td><td>the read is the second read in a pair</td></tr>
+                <tr valign="top">
+                    <td align="center">s</td><td>0x0100</td><td>the alignment is not primary</td></tr>
+                <tr valign="top">
+                    <td align="center">f</td><td>0x0200</td><td>QC failure</td></tr>
+                <tr valign="top">
+                    <td align="center">d</td><td>0x0400</td><td>optical or PCR duplicate</td></tr>
+                </tbody></table></div></blockquote>
+            <p>
+            <!-- .PP -->
+            </p><p>
+            The Please check &lt;<a href="http://samtools.sourceforge.net">http://samtools.sourceforge.net</a>&gt; for the format
+            specification and the tools for post-processing the alignment.
+            </p><p>
+            BWA generates the following optional fields. Tags starting with ‘X’ are
+            specific to BWA.
+            </p><p>
+            <!-- .TS -->
+            </p><p></p><blockquote><div id="tbl"><table cellspacing="1">
+                <!-- center box; -->
+                <!-- cb | cb -->
+                <!-- cB | l . -->
+                <tbody><tr valign="top">
+                    <td align="center"><b>Tag</b></td><td align="center"><b>Meaning</b></td></tr>
+                <tr></tr><tr></tr>
+                <tr valign="top">
+                    <td align="center"><b>NM</b></td><td>Edit distance</td></tr>
+                <tr valign="top">
+                    <td align="center"><b>MD</b></td><td>Mismatching positions/bases</td></tr>
+                <tr valign="top">
+                    <td align="center"><b>AS</b></td><td>Alignment score</td></tr>
+                <tr valign="top">
+                    <td align="center"><b>BC</b></td><td>Barcode sequence</td></tr>
+                <tr></tr><tr></tr>
+                <tr valign="top">
+                    <td align="center"><b>X0</b></td><td>Number of best hits</td></tr>
+                <tr valign="top">
+                    <td align="center"><b>X1</b></td><td>Number of suboptimal hits found by BWA</td></tr>
+                <tr valign="top">
+                    <td align="center"><b>XN</b></td><td>Number of ambiguous bases in the referenece</td></tr>
+                <tr valign="top">
+                    <td align="center"><b>XM</b></td><td>Number of mismatches in the alignment</td></tr>
+                <tr valign="top">
+                    <td align="center"><b>XO</b></td><td>Number of gap opens</td></tr>
+                <tr valign="top">
+                    <td align="center"><b>XG</b></td><td>Number of gap extentions</td></tr>
+                <tr valign="top">
+                    <td align="center"><b>XT</b></td><td>Type: Unique/Repeat/N/Mate-sw</td></tr>
+                <tr valign="top">
+                    <td align="center"><b>XA</b></td><td>Alternative hits; format: (chr,pos,CIGAR,NM;)*</td></tr>
+                <tr></tr><tr></tr>
+                <tr valign="top">
+                    <td align="center"><b>XS</b></td><td>Suboptimal alignment score</td></tr>
+                <tr valign="top">
+                    <td align="center"><b>XF</b></td><td>Support from forward/reverse alignment</td></tr>
+                <tr valign="top">
+                    <td align="center"><b>XE</b></td><td>Number of supporting seeds</td></tr>
+                </tbody></table></div></blockquote>
+            <p>
+            <!-- .PP -->
+            </p><p>
+            Note that XO and XG are generated by BWT search while the CIGAR string
+            by Smith-Waterman alignment. These two tags may be inconsistent with the
+            CIGAR string. This is not a bug.
+            </p><p>
+            <!-- .SH NOTES ON SHORT-READ ALIGNMENT -->
+            </p></blockquote>
+        <a name="5">
+            
+            <h3>NOTES ON SHORT-READ ALIGNMENT</h3>
+            
+        </a>
+        <blockquote>
+            <!-- .SS Alignment Accuracy -->
+        </blockquote>
+        <a name="6">
+            
+            <h4>&nbsp; &nbsp; Alignment Accuracy</h4>
+        </a>
+        <blockquote>
+            <!-- .PP -->
+            <p>
+            When seeding is disabled, BWA guarantees to find an alignment
+            containing maximum
+            <!-- .I maxDiff -->
+            <i>maxDiff</i> differences including
+            <!-- .I maxGapO -->
+            <i>maxGapO</i> gap opens which do not occur within
+            <!-- .I nIndelEnd -->
+            <i>nIndelEnd</i> bp towards either end of the query. Longer gaps may be found if
+            <!-- .I maxGapE -->
+            <i>maxGapE</i> is positive, but it is not guaranteed to find all hits. When seeding is
+            enabled, BWA further requires that the first
+            <!-- .I seedLen -->
+            <i>seedLen</i> subsequence contains no more than
+            <!-- .I maxSeedDiff -->
+            <i>maxSeedDiff</i> differences.
+            <!-- .PP -->
+            </p><p>
+            When gapped alignment is disabled, BWA is expected to generate the same
+            alignment as Eland version 1, the Illumina alignment program. However, as BWA
+            change ‘N’ in the database sequence to random nucleotides, hits to these
+            random sequences will also be counted. As a consequence, BWA may mark a
+            unique hit as a repeat, if the random sequences happen to be identical
+            to the sequences which should be unqiue in the database.
+            <!-- .PP -->
+            </p><p>
+            By default, if the best hit is not highly repetitive (controlled by -R), BWA
+            also finds all hits contains one more mismatch; otherwise, BWA finds all
+            equally best hits only. Base quality is NOT considered in evaluating
+            hits. In the paired-end mode, BWA pairs all hits it found. It further
+            performs Smith-Waterman alignment for unmapped reads to rescue reads with a
+            high erro rate, and for high-quality anomalous pairs to fix potential alignment
+            errors.
+            </p><p>
+            <!-- .SS Estimating Insert Size Distribution -->
+            </p></blockquote>
+        <a name="7">
+            
+            <h4>&nbsp; &nbsp; Estimating Insert Size Distribution</h4>
+        </a>
+        <blockquote>
+            <!-- .PP -->
+            <p>
+            BWA estimates the insert size distribution per 256*1024 read pairs. It
+            first collects pairs of reads with both ends mapped with a single-end
+            quality 20 or higher and then calculates median (Q2), lower and higher
+            quartile (Q1 and Q3). It estimates the mean and the variance of the
+            insert size distribution from pairs whose insert sizes are within
+            interval [Q1-2(Q3-Q1), Q3+2(Q3-Q1)]. The maximum distance x for a pair
+            considered to be properly paired (SAM flag 0x2) is calculated by solving
+            equation Phi((x-mu)/sigma)=x/L*p0, where mu is the mean, sigma is the
+            standard error of the insert size distribution, L is the length of the
+            genome, p0 is prior of anomalous pair and Phi() is the standard
+            cumulative distribution function. For mapping Illumina short-insert
+            reads to the human genome, x is about 6-7 sigma away from the
+            mean. Quartiles, mean, variance and x will be printed to the standard
+            error output.
+            </p><p>
+            <!-- .SS Memory Requirement -->
+            </p></blockquote>
+        <a name="8">
+            
+            <h4>&nbsp; &nbsp; Memory Requirement</h4>
+        </a>
+        <blockquote>
+            <!-- .PP -->
+            <p>
+            With bwtsw algorithm, 5GB memory is required for indexing the complete
+            human genome sequences. For short reads, the
+            <!-- .B aln -->
+            <b>aln</b> command uses ~3.2GB memory and the
+            <!-- .B sampe -->
+            <b>sampe</b> command uses ~5.4GB.
+            </p><p>
+            <!-- .SS Speed -->
+            </p></blockquote>
+        <a name="9">
+            
+            <h4>&nbsp; &nbsp; Speed</h4>
+        </a>
+        <blockquote>
+            <!-- .PP -->
+            <p>
+            Indexing the human genome sequences takes 3 hours with bwtsw
+            algorithm. Indexing smaller genomes with IS algorithms is
+            faster, but requires more memory.
+            <!-- .PP -->
+            </p><p>
+            The speed of alignment is largely determined by the error rate of the query
+            sequences (r). Firstly, BWA runs much faster for near perfect hits than
+            for hits with many differences, and it stops searching for a hit with
+            l+2 differences if a l-difference hit is found. This means BWA will be
+            very slow if r is high because in this case BWA has to visit hits with
+            many differences and looking for these hits is expensive. Secondly, the
+            alignment algorithm behind makes the speed sensitive to [k log(N)/m],
+            where k is the maximum allowed differences, N the size of database and m
+            the length of a query. In practice, we choose k w.r.t. r and therefore r
+            is the leading factor. I would not recommend to use BWA on data with
+            r&gt;0.02.
+            <!-- .PP -->
+            </p><p>
+            Pairing is slower for shorter reads. This is mainly because shorter
+            reads have more spurious hits and converting SA coordinates to
+            chromosomal coordinates are very costly.
+            </p><p>
+            <!-- .SH CHANGES IN BWA-0.6 -->
+            </p></blockquote>
+        <a name="10">
+            
+            <h3>CHANGES IN BWA-0.6</h3>
+            
+        </a>
+        <blockquote>
+            <!-- .PP -->
+            <p>
+            Since version 0.6, BWA has been able to work with a reference genome longer than 4GB.
+            This feature makes it possible to integrate the forward and reverse complemented
+            genome in one FM-index, which speeds up both BWA-short and BWA-SW. As a tradeoff,
+            BWA uses more memory because it has to keep all positions and ranks in 64-bit
+            integers, twice larger than 32-bit integers used in the previous versions.
+            </p><p>
+            The latest BWA-SW also works for paired-end reads longer than 100bp. In
+            comparison to BWA-short, BWA-SW tends to be more accurate for highly unique
+            reads and more robust to relative long INDELs and structural variants.
+            Nonetheless, BWA-short usually has higher power to distinguish the optimal hit
+            from many suboptimal hits. The choice of the mapping algorithm may depend on
+            the application.
+            </p><p>
+            <!-- .SH SEE ALSO -->
+            </p></blockquote>
+        <a name="11">
+            
+            <h3>SEE ALSO</h3>
+            
+        </a>
+        <blockquote>
+            BWA website &lt;<a href="http://bio-bwa.sourceforge.net">http://bio-bwa.sourceforge.net</a>&gt;, Samtools website
+            &lt;<a href="http://samtools.sourceforge.net">http://samtools.sourceforge.net</a>&gt;
+            <p>
+            <!-- .SH AUTHOR -->
+            </p></blockquote>
+        <a name="12">
+            
+            <h3>AUTHOR</h3>
+            
+        </a>
+        <blockquote>
+            Heng Li at the Sanger Institute wrote the key source codes and
+            integrated the following codes for BWT construction: bwtsw
+            &lt;<a href="http://i.cs.hku.hk/~ckwong3/bwtsw">http://i.cs.hku.hk/~ckwong3/bwtsw</a>/&gt;, implemented by Chi-Kwong Wong at
+            the University of Hong Kong and IS
+            &lt;<a href="http://yuta.256.googlepages.com/sais">http://yuta.256.googlepages.com/sais</a>&gt; originally proposed by Nong Ge
+            &lt;<a href="http://www.cs.sysu.edu.cn/nong">http://www.cs.sysu.edu.cn/nong</a>/&gt; at the Sun Yat-Sen University and
+            implemented by Yuta Mori.
+            <p>
+            <!-- .SH LICENSE AND CITATION -->
+            </p></blockquote>
+        <a name="13">
+            
+            <h3>LICENSE AND CITATION</h3>
+            
+        </a>
+        <blockquote>
+            <!-- .PP -->
+            <p>
+            The full BWA package is distributed under GPLv3 as it uses source codes
+            from BWT-SW which is covered by GPL. Sorting, hash table, BWT and IS
+            libraries are distributed under the MIT license.
+            <!-- .PP -->
+            </p><p>
+            If you use the BWA-backtrack algorithm, please cite the following
+            paper:
+            <!-- .PP -->
+            </p><p>
+            Li H. and Durbin R. (2009) Fast and accurate short read alignment with
+            Burrows-Wheeler transform. Bioinformatics, 25, 1754-1760. [PMID: 19451168]
+            <!-- .PP -->
+            </p><p>
+            If you use the BWA-SW algorithm, please cite:
+            <!-- .PP -->
+            </p><p>
+            Li H. and Durbin R. (2010) Fast and accurate long-read alignment with
+            Burrows-Wheeler transform. Bioinformatics, 26, 589-595. [PMID: 20080505]
+            <!-- .PP -->
+            </p><p>
+            If you use the fastmap component of BWA, please cite:
+            <!-- .PP -->
+            </p><p>
+            Li H. (2012) Exploring single-sample SNP and INDEL calling with whole-genome de
+            novo assembly. Bioinformatics, 28, 1838-1844. [PMID: 22569178]
+            <!-- .PP -->
+            </p><p>
+            The BWA-MEM algorithm has not been published yet.
+            </p><p>
+            <!-- .SH HISTORY -->
+            </p></blockquote>
+        <a name="14">
+            
+            <h3>HISTORY</h3>
+            
+        </a>
+        <blockquote>
+            BWA is largely influenced by BWT-SW. It uses source codes from BWT-SW
+            and mimics its binary file formats; BWA-SW resembles BWT-SW in several
+            ways. The initial idea about BWT-based alignment also came from the
+            group who developed BWT-SW. At the same time, BWA is different enough
+            from BWT-SW. The short-read alignment algorithm bears no similarity to
+            Smith-Waterman algorithm any more. While BWA-SW learns from BWT-SW, it
+            introduces heuristics that can hardly be applied to the original
+            algorithm. In all, BWA does not guarantee to find all local hits as what
+            BWT-SW is designed to do, but it is much faster than BWT-SW on both
+            short and long query sequences.
+            <p>
+            I started to write the first piece of codes on 24 May 2008 and got the
+            initial stable version on 02 June 2008. During this period, I was
+            acquainted that Professor Tak-Wah Lam, the first author of BWT-SW paper,
+            was collaborating with Beijing Genomics Institute on SOAP2, the successor
+            to SOAP (Short Oligonucleotide Analysis Package). SOAP2 has come out in
+            November 2008. According to the SourceForge download page, the third
+            BWT-based short read aligner, bowtie, was first released in August
+            2008. At the time of writing this manual, at least three more BWT-based
+            short-read aligners are being implemented.
+            </p><p>
+            The BWA-SW algorithm is a new component of BWA. It was conceived in
+            November 2008 and implemented ten months later.
+            </p><p>
+            The BWA-MEM algorithm is based on an algorithm finding super-maximal exact
+            matches (SMEMs), which was first published with the fermi assembler paper
+            in 2012. I first implemented the basic SMEM algorithm in the
+            <!-- .B fastmap -->
+            <b>fastmap</b> command for an experiment and then extended the basic algorithm and added the
+            extension part in Feburary 2013 to make BWA-MEM a fully featured mapper.
+            </p><p>
+            </p></blockquote>
+        <p></p><hr>
+        </div>
+
+<!-- 英文原文 结束 -->
+
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/CNCBI/BWA-Manual-CN">BWA-Manual-CN</a> is maintained by <a href="https://github.com/CNCBI">CNCBI</a>.</span>
