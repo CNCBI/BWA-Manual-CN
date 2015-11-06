@@ -46,5 +46,11 @@ You can read the Chinese translation of the introduction page of BWA at [here](h
     对于所有的算法，BWA首先需要（用**index**命令）建立参考基因组的FM-索引。比对算法要通过不同的子命令来调用：***aln/samse/sampe***对应BWA-backtrack，**bwasw**对应BWA-SW，**mem**对应BWA-MEM算法。
     
 ###COMMANDS AND OPTIONS-命令和选项
-**index**    ```bwa index [-p prefix] [-a algoType] <in.db.fasta>```
-             对FASTA格式的数据库序列建立索引。
+**index**    
+```bwa index [-p prefix] [-a algoType] <in.db.fasta>```
+对FASTA格式的数据库序列建立索引。
+
+选项：
+**-p** *STR* 输出数据库的前缀。[和db文件名相同]([]中的内容表示不指定该参数时，命令自动添加的默认值。译者注)
+**-a** *STR* 建立BWT索引的算法，可选的选项有：
+>**is**
