@@ -49,7 +49,7 @@ You can read the Chinese translation of the introduction page of BWA at [here](h
 **index**<space><space><space><space>```bwa index [-p prefix] [-a algoType] <in.db.fasta>```
 对FASTA格式的database(可译为数据库，原意为要建立索引的参考基因组文件。译者注)序列建立索引。<br/>
 选项：<br/>
-**-p** *STR* 输出数据库的前缀。[和db文件名相同]([]中的内容表示不指定该参数时，命令自动添加的默认值。译者注)<br/>
+**-p** *STR* 输出数据库的前缀。\[和db文件名相同\]([]中的内容表示不指定该参数时，命令自动添加的默认值。译者注)<br/>
 **-a** *STR* 建立BWT索引的算法，可选的选项有：<br/>
 <space><space><space><space>**is**
 IS线性时间算法来创建数组后缀。这需要5.37N的内存，N是database的大小。IS稍微快一点，但是当databse大于2GB时，它就不能工作了。由于它的简便性，IS是默认的算法。现在IS算法的代码是由Yuta Mori重新实现的。<br/>
