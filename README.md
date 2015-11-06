@@ -41,4 +41,9 @@ You can read the Chinese translation of the introduction page of BWA at [here](h
     bwa bwasw ref.fa long_read.fq > aln.sam
 ```
 ###DESCRIPTION-描述
-    BWA是一个把低发散序列比对到一个大型参考基因组（比如说人类基因组）上去的软件包。
+    BWA是一个把低发散序列比对到一个大型参考基因组（比如说人类基因组）上去的软件包。它由三个算法组成：BWA-backtrack, BWA-SW和BWA-MEM。第一个算法是为小于等于100bp的illumina测序reads设计的，另外两个是为更长的序列，从70bp到1Mbp，而设计的。BWA-MEM和BWA-SW有一些相同的特性，比如支持长reads和剪切比对，但是BWA-MEM，也是最新的算法，是通常被推荐用来做高质量查询的，因为它更快，更准确。在70-100bp的illumina reads上，BWA-MEM也比BWA-backtrack有更好的性能。
+    
+    对于所有的算法，BWA首先需要（用**index**命令）建立参考基因组的FM-索引。比对算法要通过不同的子命令来调用：***aln/samse/sampe***对应BWA-backtrack，**bwasw**对应BWA-SW，**mem**对应BWA-MEM算法。
+    
+###COMMANDS AND OPTIONS-命令和选项
+    **index**       
