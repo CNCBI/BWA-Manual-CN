@@ -8,113 +8,52 @@
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
-    
-
   </head>
   <body>
     <section class="page-header">
       <h1 class="project-name">BWA-Manual-CN</h1>
       <h2 class="project-tagline">This is the Chinese translation of BWA&#39;s Manual page.</h2>
+      <h2 class="project-tagline">本页面是BWA使用手册的中文翻译。</h2>
       <a href="https://github.com/CNCBI/BWA-Manual-CN" class="btn">View on GitHub</a>
-      <a href="https://github.com/CNCBI/BWA-Manual-CN/blob/master/Introduction.md" class="btn">View Introduction page (查看介绍页)</a>
+      <a href="http://cncbi.github.io/BWA-Manual-CN/introduction" class="btn">View Introduction page (查看介绍页)</a>
     </section>
 
     <section class="main-content">
-<h3>
-<a id="name-名字" class="anchor" href="#name-%E5%90%8D%E5%AD%97" aria-hidden="true"><span class="octicon octicon-link"></span></a>NAME-名字</h3>
-
-<pre><code>bwa - Burrows-Wheeler(伯罗斯-惠勒)对比工具
-</code></pre>
-
-<h3>
-<a id="contents-目录" class="anchor" href="#contents-%E7%9B%AE%E5%BD%95" aria-hidden="true"><span class="octicon octicon-link"></span></a>CONTENTS-目录</h3>
-
-<pre><code>概要
-描述
-命令和选项
-Sam对比格式
-短序列对比的注意事项
-    对比准确度
-    估计插入大小分布
-    内存要求
-    速度
-Bwa-0.6的变化
-另请参阅
-作者
-许可证和引用
-历史
-</code></pre>
-
-<h3>
-<a id="synopsis-概要" class="anchor" href="#synopsis-%E6%A6%82%E8%A6%81" aria-hidden="true"><span class="octicon octicon-link"></span></a>SYNOPSIS-概要</h3>
-
-<div class="highlight highlight-source-shell"><pre>    bwa index ref.fa
-    bwa mem ref.fa reads.fq <span class="pl-k">&gt;</span> aln-se.sam
-    bwa mem ref.fa read1.fq read2.fq <span class="pl-k">&gt;</span> aln-pe.sam
-    bwa aln ref.fa short_read.fq <span class="pl-k">&gt;</span> aln_sa.sai
-    bwa samse ref.fa aln_sa.sai short_read.fq <span class="pl-k">&gt;</span> aln-se.sam
-    bwa sampe ref.fa aln_sa1.sai aln_sa2.sai read1.fq read2.fq <span class="pl-k">&gt;</span> aln-pe.sam
-    bwa bwasw ref.fa long_read.fq <span class="pl-k">&gt;</span> aln.sam</pre></div>
-
-<h3>
-<a id="description-描述" class="anchor" href="#description-%E6%8F%8F%E8%BF%B0" aria-hidden="true"><span class="octicon octicon-link"></span></a>DESCRIPTION-描述</h3>
-
-<pre><code>BWA是一个把低发散序列比对到一个大型参考基因组（比如说人类基因组）上去的软件包。它由三个算法组成：BWA-backtrack, BWA-SW和BWA-MEM。第一个算法是为小于等于100bp的illumina测序reads设计的，另外两个是为更长的序列，从70bp到1Mbp，而设计的。BWA-MEM和BWA-SW有一些相同的特性，比如支持长reads和剪切比对，但是BWA-MEM，也是最新的算法，是通常被推荐用来做高质量查询的，因为它更快，更准确。在70-100bp的illumina reads上，BWA-MEM也比BWA-backtrack有更好的性能。
-
-对于所有的算法，BWA首先需要（用**index**命令）建立参考基因组的FM-索引。比对算法要通过不同的子命令来调用：***aln/samse/sampe***对应BWA-backtrack，**bwasw**对应BWA-SW，**mem**对应BWA-MEM算法。
-</code></pre>
-
-<h3>
-<a id="commands-and-options-命令和选项" class="anchor" href="#commands-and-options-%E5%91%BD%E4%BB%A4%E5%92%8C%E9%80%89%E9%A1%B9" aria-hidden="true"><span class="octicon octicon-link"></span></a>COMMANDS AND OPTIONS-命令和选项</h3>
-
-<p><strong>index</strong><code>bwa index [-p prefix] [-a algoType] &lt;in.db.fasta&gt;</code>
-对FASTA格式的database(可译为数据库，原意为要建立索引的参考基因组文件。译者注)序列建立索引。<br>
-选项：<br>
-<strong>-p</strong> <em>STR</em> 输出数据库的前缀。[和db文件名相同]([ ]中的内容表示不指定该参数时，命令自动添加的默认值。译者注)<br>
-<strong>-a</strong> <em>STR</em> 建立BWT索引的算法，可选的选项有：<br>
-<strong>is</strong>
-IS线性时间算法来创建数组后缀。这需要5.37N的内存，N是database的大小。IS稍微快一点，但是当databse大于2GB时，它就不能工作了。由于它的简便性，IS是默认的算法。现在IS算法的代码是由Yuta Mori重新实现的。<br></p>
-
-<p><strong>bwtsw</strong>
-BWT-SW中实现的算法，这个方法可以对人类全基因组建立索引。</p>
-
-<p><strong>mem</strong><code>bwa mem [-aCHMpP] [-t nThreads] [-k minSeedLen] [-w bandWidth] [-d zDropoff] [-r seedSplitRatio] [-c maxOcc] [-A matchScore] [-B mmPenalty] [-O gapOpenPen] [-E gapExtPen] [-L clipPen] [-U unpairPen] [-R RGline] [-v verboseLevel] db.prefix reads.fq [mates.fq]</code></p>
-
-
-<!-- 英文原文 开始 -->
+    
+<!-- 英文原文 翻译中 开始 -->
     <div id="wrap"><a name="top"></a>
         <!-- .SH NAME -->
         <a name="0">
             
-            <h3>NAME</h3>
+            <h3>NAME - 名字</h3>
             
         </a>
         <blockquote>
             <!-- .PP -->
             <p>
-            bwa - Burrows-Wheeler Alignment Tool
+            bwa - Burrows-Wheeler(伯罗斯-惠勒)对比工具
             <!-- .SH SYNOPSIS -->
             </p></blockquote>
-        <a name="contents"></a><h3>CONTENTS</h3>
+        <a name="contents"></a><h3>CONTENTS - 目录</h3>
         <blockquote>
-            <a href="#1">Synopsis</a><br>
-            <a href="#2">Description</a><br>
-            <a href="#3">Commands And Options</a><br>
-            <a href="#4">Sam Alignment Format</a><br>
-            <a href="#5">Notes On Short-read Alignment</a><br>
-            &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;<a href="#6">Alignment Accuracy</a><br>
-            &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;<a href="#7">Estimating Insert Size Distribution</a><br>
-            &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;<a href="#8">Memory Requirement</a><br>
-            &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;<a href="#9">Speed</a><br>
-            <a href="#10">Changes In Bwa-0.6</a><br>
-            <a href="#11">See Also</a><br>
-            <a href="#12">Author</a><br>
-            <a href="#13">License And Citation</a><br>
-            <a href="#14">History</a><br>
+            <a href="#1">概要</a><br>
+            <a href="#2">描述</a><br>
+            <a href="#3">命令和选项</a><br>
+            <a href="#4">Sam对比格式</a><br>
+            <a href="#5">短序列对比的注意事项</a><br>
+            &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;<a href="#6">对比准确度</a><br>
+            &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;<a href="#7">估计插入大小分布</a><br>
+            &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;<a href="#8">内存要求</a><br>
+            &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;<a href="#9">速度</a><br>
+            <a href="#10">Bwa-0.6的变化</a><br>
+            <a href="#11">另请参阅</a><br>
+            <a href="#12">作者</a><br>
+            <a href="#13">许可证和引用</a><br>
+            <a href="#14">历史</a><br>
         </blockquote>
         <a name="15">
             
-            <h3>SYNOPSIS</h3>
+            <h3>SYNOPSIS - 摘要</h3>
             
         </a>
         <blockquote>
@@ -144,38 +83,21 @@ BWT-SW中实现的算法，这个方法可以对人类全基因组建立索引�
             </p></blockquote>
         <a name="2">
             
-            <h3>DESCRIPTION</h3>
+            <h3>DESCRIPTION - 描述</h3>
             
         </a>
         <blockquote>
             <!-- .PP -->
             <p>
-            BWA is a software package for mapping low-divergent sequences against a large
-            reference genome, such as the human genome. It consists of three algorithms:
-            BWA-backtrack, BWA-SW and BWA-MEM. The first algorithm is designed for Illumina
-            sequence reads up to 100bp, while the rest two for longer sequences ranged from
-            70bp to 1Mbp. BWA-MEM and BWA-SW share similar features such as long-read
-            support and split alignment, but BWA-MEM, which is the latest, is generally
-            recommended for high-quality queries as it is faster and more accurate.
-            BWA-MEM also has better performance than BWA-backtrack for 70-100bp Illumina
-            reads.
+            BWA是一个把低发散序列比对到一个大型参考基因组（比如说人类基因组）上去的软件包。它由三个算法组成：BWA-backtrack, BWA-SW和BWA-MEM。第一个算法是为小于等于100bp的illumina测序reads设计的，另外两个是为更长的序列，从70bp到1Mbp，而设计的。BWA-MEM和BWA-SW有一些相同的特性，比如支持长reads和剪切比对，但是BWA-MEM，也是最新的算法，是通常被推荐用来做高质量查询的，因为它更快，更准确。在70-100bp的illumina reads上，BWA-MEM也比BWA-backtrack有更好的性能。
             </p><p>
-            For all the algorithms, BWA first needs to construct the FM-index for
-            the reference genome (the
-            <!-- .B index -->
-            <b>index</b> command). Alignment algorithms are invoked with different sub-commands:
-            <!-- .BR aln / samse / sampe -->
-            <b>aln</b>/<b>samse</b>/<b>sampe</b> for BWA-backtrack,
-            <!-- .B bwasw -->
-            <b>bwasw</b> for BWA-SW and
-            <!-- .B mem -->
-            <b>mem</b> for the BWA-MEM algorithm.
-            </p><p>
+            对于所有的算法，BWA首先需要（用<b>index</b>命令）建立参考基因组的FM-索引。比对算法要通过不同的子命令来调用：<b>aln</b>/<b>samse</b>/<b>sampe</b>对应BWA-backtrack，<b>bwasw</b> 对应BWA-SW，<b>mem</b> 对应BWA-MEM算法。
+            <p>
             <!-- .SH COMMANDS AND OPTIONS -->
             </p></blockquote>
         <a name="3">
             
-            <h3>COMMANDS AND OPTIONS</h3>
+            <h3>COMMANDS AND OPTIONS - 命令和选项</h3>
             
         </a>
         <blockquote>
@@ -186,23 +108,23 @@ BWT-SW中实现的算法，这个方法可以对人类全基因组建立索引�
                     <b>index</b> </td><td valign="bottom">
                         bwa index [-p prefix] [-a algoType] &lt;in.db.fasta&gt;
                         <p>
-                        Index database sequences in the FASTA format.
+                        对FASTA格式的database(可译为数据库，原意为要建立索引的参考基因组文件。译者注)序列建立索引。
                         </p><p>
                         <!-- .B OPTIONS: -->
-                        <b>OPTIONS:</b> <!-- .RS -->
+                        <b>选项：</b> <!-- .RS -->
                         <!-- .TP 10 -->
                         <table width="100%" cellpadding="3"><!-- tsb: <B>OPTIONS:</B>  -->
                             <tbody><tr></tr><tr></tr>
                                 <tr valign="top"><td width="10%" nowrap="">
                                     <!-- .BI -p \ STR -->
                                     <b>-p</b><i> STR</i> </td><td valign="bottom">
-                                        Prefix of the output database [same as db filename]
+                                        输出数据库的前缀。[和db文件名相同]([ ]中的内容表示不指定该参数时，命令自动添加的默认值。译者注)
                                         <!-- .TP -->
                                     </td></tr>
                                 <tr valign="top"><td width="10%" nowrap="">
                                     <!-- .BI -a \ STR -->
                                     <b>-a</b><i> STR</i> </td><td valign="bottom">
-                                        Algorithm for constructing BWT index. Available options are:
+                                        建立BWT索引的算法，可选的选项有：
                                         <!-- .RS -->
                                         <!-- .TP -->
                                         <table width="100%" cellpadding="3"><!-- tsb: Algorithm for constructing BWT index. Available options are:
@@ -211,18 +133,13 @@ BWT-SW中实现的算法，这个方法可以对人类全基因组建立索引�
                                             <tr valign="top"><td width="6%" nowrap="">
                                                 <!-- .B is -->
                                                 <b>is</b> </td><td valign="bottom">
-                                                    IS linear-time algorithm for constructing suffix array. It requires
-                                                    5.37N memory where N is the size of the database. IS is moderately fast,
-                                                    but does not work with database larger than 2GB. IS is the default
-                                                    algorithm due to its simplicity. The current codes for IS algorithm are
-                                                    reimplemented by Yuta Mori.
+                                                    IS线性时间算法来创建数组后缀。这需要5.37N的内存，N是database的大小。IS稍微快一点，但是当databse大于2GB时，它就不能工作了。由于它的简便性，IS是默认的算法。现在IS算法的代码是由Yuta Mori重新实现的。
                                                     <!-- .TP -->
                                                 </td></tr>
                                             <tr valign="top"><td width="6%" nowrap="">
                                                 <!-- .B bwtsw -->
                                                 <b>bwtsw</b> </td><td valign="bottom">
-                                                    Algorithm implemented in BWT-SW. This method works with the whole human
-                                                    genome.
+                                                    BWT-SW中实现的算法，这个方法可以对人类全基因组建立索引。
                                                     <!-- .RE -->
                                                 </td></tr>
                                             <tr></tr></tbody></table><!-- .RE -->
