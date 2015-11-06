@@ -53,4 +53,4 @@ You can read the Chinese translation of the introduction page of BWA at [here](h
 选项：
 **-p** *STR* 输出数据库的前缀。[和db文件名相同]([]中的内容表示不指定该参数时，命令自动添加的默认值。译者注)
 **-a** *STR* 建立BWT索引的算法，可选的选项有：
->**is**
+<space><space><space><space>**is**
